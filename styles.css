@@ -1,0 +1,526 @@
+/* ==============================
+   Base & Vars
+============================== */
+:root{
+  color-scheme: light dark;
+  --card-w:300px;
+  --card-h:200px;
+  --card-pad-x:1.5rem;
+  --card-pad-y:1.25rem;
+  --prompt-offset:clamp(4rem,10vh,12rem);
+
+  /* ==== Theme tokens (light) ==== */
+  --bg:#ffffff;
+  --text:#222222;
+  --muted:#555555;
+  --panel:#f4f4f4;
+  --border:#dddddd;
+  --card-bg:#ffffff;
+  --shadow-rgba:0,0,0;
+  --accent:#7c7cf3;
+  /* Scrollbar colors */
+  --scrollbar-track: color-mix(in oklab, var(--card-bg) 92%, var(--text) 8%);
+  --scrollbar-thumb: color-mix(in oklab, var(--text) 35%, var(--card-bg) 65%);
+}
+
+html[data-theme="dark"]{
+  /* ==== Theme tokens (dark) ==== */
+  --bg:#0e0f12;
+  --text:#e9e9ee;
+  --muted:#b7b9c0;
+  --panel:#16181e;
+  --border:#2a2f38;
+  --card-bg:#11141a;
+  --shadow-rgba:0,0,0;
+  --accent:#7c7cf3; /* keep same or tweak */
+  --scrollbar-track: color-mix(in oklab, var(--card-bg) 85%, var(--text) 15%);
+  --scrollbar-thumb: color-mix(in oklab, var(--text) 55%, var(--card-bg) 45%);
+}
+
+/* make the scroll arrow light in dark mode */
+html[data-theme="dark"] .scroll-arrow {
+  filter: invert(1) brightness(1.2) contrast(0.95);
+}
+
+*{ box-sizing:border-box }
+body{
+  margin:0;
+  font-family:'Georgia',serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.hidden{ display:none }
+
+/* Wire key surfaces to tokens */
+.sidebar{ background:var(--panel); border:1px solid var(--border); }
+.circle-button{ background:var(--card-bg); border:1px solid var(--border); color:var(--text); }
+.board-card{ background:var(--card-bg); border:1px solid var(--border); box-shadow:0 2px 8px rgba(var(--shadow-rgba),.12); }
+.quote-card cite,.write-card cite{ color:var(--muted); }
+.tag-picker{ background:var(--card-bg); border:1px solid var(--border); }
+.tag-create input,
+.write-form textarea,
+#quoteForm textarea,#quoteForm input{
+  background:var(--card-bg);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+#quoteForm button{
+  border:1px solid var(--border) !important;
+  background:var(--card-bg) !important;
+  color:var(--text) !important;
+}
+
+/* ==============================
+   Layout
+============================== */
+.container{
+  display:flex; flex-direction:column; align-items:stretch;
+  padding:0 20px 20px;
+}
+.icon{
+  position:fixed; top:20px; left:20px; width:50px; height:50px; margin:0;
+  z-index:1100; cursor:pointer;
+}
+.main{
+  display:flex; flex-direction:column; align-items:stretch; text-align:left; margin-top:0;
+}
+
+/* Hero */
+.subtitle{ font-size:1.5rem; font-style:italic; margin:.5rem 0; color:var(--muted) }
+.title{ font-size:3rem; font-weight:bold; margin:.5rem 0; color:var(--text) }
+.logo-image{ max-width:300px; width:100%; height:auto; margin:1rem 0 }
+.tagline{ font-size:1.2rem; color:var(--muted); margin-top:.5rem }
+
+.hero{
+  position:relative; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  padding-bottom:var(--prompt-offset);
+}
+.hero .scroll-prompt{
+  position:absolute; bottom:var(--prompt-offset); left:50%; transform:translateX(-50%);
+  text-align:center; z-index:1; transition:opacity 200ms,transform 200ms;
+}
+.hero .scroll-prompt p{ font-weight:bold; margin:.5rem 0; font-size:1.2rem; color:var(--text) }
+.hero .scroll-prompt .scroll-arrow{ display:block; margin:0 auto; max-width:40px; height:auto }
+.hero .scroll-prompt.hide{ opacity:0; transform:translate(-50%,10px); pointer-events:none }
+
+/* ==============================
+   Sidebar (drawer)
+============================== */
+.sidebar{
+  position:absolute; top:0; left:0; width:280px; max-height:calc(100vh - 40px);
+  overflow-y:auto; overflow-x:hidden;
+  border-radius:5px; padding:10px 16px; transform:translateX(-120%);
+  transition:transform 250ms ease; z-index:900;
+}
+.sidebar ul{ list-style:none; padding:0; margin:0 }
+.sidebar.open{ transform:translateX(0) }
+
+.sidebar-buttons{
+  display:flex; justify-content:space-around; gap:.5rem; margin-bottom:1rem; padding-left:0;
+}
+.circle-button{
+  width:40px; height:40px; border-radius:50%;
+  font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  box-shadow:0 1px 4px rgba(var(--shadow-rgba),.1);
+  transition:background .2s, transform .15s, border-color .2s;
+}
+.circle-button:hover{ background:color-mix(in oklab, var(--card-bg), var(--text) 6%); transform:translateY(-2px) }
+.circle-button:active{ transform:translateY(0) }
+
+.search-box{ margin-bottom:10px }
+
+#searchBox input {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+
+.plus-menu{ margin-top:10px }
+.plus-option{ padding:5px 0; border-bottom:1px solid var(--border) }
+.plus-option:last-child{ border-bottom:none }
+
+
+.customize-menu{ margin-top:10px; position:relative; z-index:1; }
+
+/* ==============================
+   Customize panel
+============================== */
+.customize-menu h3{ margin:.25rem 0 .5rem; font-size:1rem; color:var(--text) }
+.setting-row{
+  display:flex; gap:.75rem; align-items:center;
+  padding:.5rem 0; border-top:1px dashed var(--border);
+}
+.setting-row:first-of-type{ border-top:none; }
+.setting-text .muted{ color:var(--muted); font-size:.85rem; }
+
+/* Toggle switch */
+.switch{ position:relative; display:inline-block; width:46px; height:26px; flex:0 0 auto; }
+.switch input{ opacity:0; width:0; height:0; }
+.slider{
+  position:absolute; inset:0; background:color-mix(in oklab, var(--panel), var(--text) 8%);
+  border:1px solid var(--border); border-radius:999px; transition:background .2s;
+}
+.slider:before{
+  content:""; position:absolute; height:20px; width:20px; left:3px; top:50%;
+  transform:translateY(-50%); background:var(--card-bg); border:1px solid var(--border);
+  border-radius:50%; transition:transform .2s;
+}
+.switch input:checked + .slider{ background:var(--accent); }
+.switch input:checked + .slider:before{ transform:translate(20px,-50%); }
+
+/* Tooltip theme tweak (optional) */
+html[data-theme="dark"] #sidebarTooltip{
+  background:rgba(255,255,255,.12);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+/* ==============================
+   Board grid
+============================== */
+#boardGrid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; padding:1rem;
+}
+.no-results,.empty-board{
+  text-align:center; font-style:italic; color:var(--muted); margin:2rem 0;
+}
+.no-results{ margin:1rem 0; grid-column:1 / -1 }
+
+/* Keep structure during filtering */
+.board-grid .board-card{ visibility:visible }
+.board-grid .hidden-by-search,
+.board-grid .hidden-by-tag{ display:none }
+
+/* ==============================
+   Cards (shared shell)
+============================== */
+.board-card{
+  position:relative; display:flex; flex-direction:column; gap:.4rem;
+  border-radius:12px;
+  cursor:grab; max-width:var(--card-w); max-height:var(--card-h);
+  overflow:auto; padding:var(--card-pad-y) var(--card-pad-x); transition:opacity .2s ease;
+}
+.board-card.dragging{ opacity:.7; cursor:grabbing }
+
+/* scroll reveal */
+.board-card.reveal{ opacity:0; transform:translateY(14px); transition:opacity 420ms,transform 420ms; will-change:opacity,transform }
+.board-card.reveal.in{ opacity:1; transform:translateY(0) }
+@media (prefers-reduced-motion:reduce){
+  .board-card.reveal,.board-card.reveal.in{ transition:none; opacity:1; transform:none }
+}
+
+/* Overlay container (Edit/Tag/Delete) */
+.board-card .card-overlay{
+  position:absolute; top:.5rem; right:.5rem; display:flex; flex-direction:column; gap:.4rem;
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:2;
+}
+.board-card:hover .card-overlay,
+.board-card .card-overlay:focus-within{ opacity:1; pointer-events:auto }
+
+/* Round icon buttons */
+.card-overlay button,
+.visual-card > .card-delete,
+.card-tag-button{
+  width:32px; height:32px; border-radius:50%; padding:0; display:flex; align-items:center; justify-content:center;
+  background:color-mix(in oklab, var(--card-bg), var(--text) 4%); border:1px solid var(--border); cursor:pointer;
+  transition:background .2s, transform .15s, border-color .2s;
+}
+.card-overlay button:hover,
+.visual-card > .card-delete:hover,
+.card-tag-button:hover{
+  background:color-mix(in oklab, var(--card-bg), var(--text) 10%); transform:translateY(-2px);
+}
+.card-overlay button svg,
+.visual-card > .card-delete svg,
+.card-tag-button svg{ width:16px; height:16px; display:block }
+
+/* Touch: always visible */
+@media (hover:none){
+  .card-overlay,.card-delete{ opacity:1; pointer-events:auto }
+}
+
+/* default (light mode) */
+.tag-list li,
+.tag-chip,
+.tag-chip-btn,
+.tag-list .delete-tag {
+  color: #000 !important; /* black text in light mode */
+}
+
+/* dark mode default = white */
+html[data-theme="dark"] .tag-list li,
+html[data-theme="dark"] .tag-chip,
+html[data-theme="dark"] .tag-chip-btn,
+html[data-theme="dark"] .tag-list .delete-tag {
+  color: #fff !important;
+}
+
+/* selected/active → black text for better contrast (all modes) */
+.tag-chip.active,
+.tag-chip-btn.active,
+.tag-list li.active {
+  color: #000 !important;
+}
+
+
+/* Quote / Write content */
+.quote-body blockquote{
+  margin:0 0 .25rem 0; font-size:1rem; line-height:1.35;
+  display:-webkit-box; -webkit-line-clamp:6; line-clamp:6; -webkit-box-orient:vertical; overflow:hidden;
+}
+.quote-card cite,.write-card cite{
+  font-size:.85rem; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* Hide overlay when inline edit form is open */
+.quote-edit-form:not(.hidden) ~ .card-overlay{ opacity:0 !important; pointer-events:none !important }
+
+/* Add Quote form buttons */
+#quoteForm button{
+  flex:1; padding:.5rem 1rem; border-radius:999px;
+  font-size:.9rem; cursor:pointer;
+  transition:background .2s ease, transform .15s ease, box-shadow .2s ease;
+  box-shadow:0 2px 4px rgba(var(--shadow-rgba),0.08);
+}
+#quoteForm button:hover{
+  background:color-mix(in oklab, var(--card-bg), var(--text) 6%);
+  transform:translateY(-2px);
+  box-shadow:0 4px 6px rgba(var(--shadow-rgba),0.12);
+}
+#quoteForm button:active{ transform:translateY(0); box-shadow:0 1px 3px rgba(var(--shadow-rgba),0.08) }
+#quoteForm #submitQuote{ font-weight:600 }
+#quoteForm #cancelQuote{ color:var(--muted) }
+
+/* Write badge */
+.write-card::before{
+  content:"Write"; font-size:.7rem; align-self:flex-start; padding:.1rem .45rem; border-radius:999px;
+  border:1px solid var(--border); color:var(--muted); background:color-mix(in oklab, var(--card-bg), var(--text) 3%);
+  margin-bottom:.25rem;
+}
+
+/* Quote card: center both */
+.quote-card{ display:flex; justify-content:center; align-items:center; text-align:center; }
+.quote-card .quote-body{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1;
+}
+.quote-card blockquote,.quote-card cite{ width:100% }
+
+/* Write card: left-aligned */
+.write-card{ display:block; text-align:left }
+
+/* Visual card (full-bleed image) */
+.visual-card{ overflow:hidden; padding:0; max-width:var(--card-w); max-height:var(--card-h) }
+.visual-card .visual-image{ width:100%; height:100%; object-fit:cover; display:block }
+
+/* Visual card standalone delete reveal */
+.visual-card:hover > .card-delete,
+.visual-card > .card-delete:focus-visible{ opacity:1; pointer-events:auto }
+
+/* Firefox */
+.board-card,
+.tag-picker .picker-list,
+.write-form textarea,
+.write-modal {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.board-card::-webkit-scrollbar,
+.tag-picker .picker-list::-webkit-scrollbar,
+.write-form textarea::-webkit-scrollbar,
+.write-modal::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.board-card::-webkit-scrollbar-track,
+.tag-picker .picker-list::-webkit-scrollbar-track,
+.write-form textarea::-webkit-scrollbar-track,
+.write-modal::-webkit-scrollbar-track{
+  background: var(--scrollbar-track);
+  border-radius: 8px;
+}
+
+.board-card::-webkit-scrollbar-thumb,
+.tag-picker .picker-list::-webkit-scrollbar-thumb,
+.write-form textarea::-webkit-scrollbar-thumb,
+.write-modal::-webkit-scrollbar-thumb{
+  background: var(--scrollbar-thumb);
+  border-radius: 8px;
+  border: 2px solid var(--scrollbar-track); /* creates a nice inset look */
+}
+
+.board-card::-webkit-scrollbar-thumb:hover,
+.tag-picker .picker-list::-webkit-scrollbar-thumb:hover,
+.write-form textarea::-webkit-scrollbar-thumb:hover,
+.write-modal::-webkit-scrollbar-thumb:hover{
+  background: color-mix(in oklab, var(--scrollbar-thumb), var(--text) 12%);
+}
+
+
+/* ==============================
+   Tags (manager + chips)
+============================== */
+.tag-manager{ margin-top:12px; padding-top:8px; border-top:1px dashed var(--border) }
+.tag-manager h3{ margin:0 0 8px; font-size:1rem; color:var(--text) }
+.tag-create{ display:flex; gap:6px; margin-bottom:6px }
+.tag-create input{
+  flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px;
+  background:var(--card-bg); color:var(--text);
+}
+.tag-create button{
+  padding:6px 10px; border:1px solid var(--border); background:color-mix(in oklab, var(--card-bg), var(--text) 4%);
+  border-radius:6px; cursor:pointer; color:var(--text);
+}
+.tag-limit{ color:#a00; font-size:.85rem; margin:4px 0 } /* kept explicit (semantic) */
+.tag-list{
+  list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:6px
+}
+.tag-list li{
+  display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px;
+  border:1px solid var(--border); background:color-mix(in oklab, var(--card-bg), var(--text) 4%); font-size:.85rem; color:var(--text);
+}
+.tag-list .delete-tag{ cursor:pointer; border:none; background:transparent; font-size:.95rem; color:var(--muted) }
+
+.card-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px }
+.tag-chip{
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:.75rem;
+  border:1px solid var(--border);
+  background:color-mix(in oklab, var(--card-bg), var(--text) 6%); color:var(--text);
+}
+
+/* Tag filter bar (top of board) */
+#tagFilterBar{ width:100%; align-self:stretch }
+.tag-filter-bar{
+  display:flex; flex-wrap:wrap; gap:.5rem; justify-content:flex-start; align-items:center;
+  padding:.5rem 1rem .25rem; text-align:left;
+}
+.tag-chip-btn{
+  border:1px solid var(--border); background:var(--card-bg); color:var(--text);
+  border-radius:999px; padding:.25rem .6rem; font-size:.85rem; cursor:pointer; line-height:1;
+  transition:transform 120ms, background 120ms, border-color 120ms;
+  display:inline-flex; margin:0;
+}
+.tag-chip-btn:hover{ transform:translateY(-1px); background:color-mix(in oklab, var(--card-bg), var(--text) 6%) }
+.tag-chip-btn.active{ border-color:color-mix(in oklab, var(--border), var(--text) 20%); background:color-mix(in oklab, var(--card-bg), var(--text) 8%); font-weight:600 }
+
+/* Sidebar tag list chips */
+.sidebar .tag-list li,
+.sidebar .tag-chip,
+.sidebar .tag-chip-btn {
+  color: #222 !important;   /* always dark text */
+}
+
+.sidebar .tag-list .delete-tag {
+  color: #222 !important;   /* always black */
+}
+
+/* default tag text = white */
+.tag-list li,
+.tag-chip,
+.tag-chip-btn,
+.tag-list .delete-tag {
+  color: #fff !important;
+}
+
+/* when selected/active → black text for contrast */
+.tag-chip.active,
+.tag-chip-btn.active,
+.tag-list li.active {
+  color: #000 !important;
+}
+
+
+/* ==============================
+   Forms / Modals
+============================== */
+.quote-edit-form.hidden{ display:none }
+
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.5);
+  display:flex; justify-content:center; align-items:center; z-index:1200;
+}
+.modal-overlay.hidden{ display:none }
+.write-modal{
+  background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
+  padding:1.5rem; max-width:600px; width:90%; max-height:80%; overflow-y:auto;
+  box-shadow:0 4px 20px rgba(var(--shadow-rgba),.25); color:var(--text);
+}
+.write-form textarea{
+  width:100%; height:300px; resize:vertical; padding:.75rem; font-size:1rem; line-height:1.4;
+  border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text);
+}
+#copyWrite{
+  padding:.35rem .7rem; border:1px solid var(--border); background:color-mix(in oklab, var(--card-bg), var(--text) 4%);
+  border-radius:8px; cursor:pointer; color:var(--text);
+}
+#copyWrite:disabled{ opacity:.6; cursor:default }
+
+/* ==============================
+   Drag & Drop visuals
+============================== */
+.drag-ghost{
+  position:fixed; top:0; left:0; margin:0; z-index:2000; pointer-events:none; opacity:.95;
+  transform:translate3d(0,0,0); will-change:transform; box-shadow:0 10px 24px rgba(var(--shadow-rgba),.18);
+}
+.drag-placeholder{ border:2px dashed var(--border); border-radius:12px; background:transparent; height:0 }
+.board-card.drag-origin{ opacity:.25 }
+.board-card.drop-target{ outline:2px dashed color-mix(in oklab, var(--border), var(--text) 15%); outline-offset:4px }
+
+/* Visual cards need overlay too */
+.visual-card .card-overlay{
+  position:absolute; top:8px; right:8px; display:flex; gap:.4rem; opacity:0; pointer-events:none; transition:opacity .15s;
+}
+.visual-card:hover .card-overlay,
+.visual-card .card-overlay:focus-within{ opacity:1; pointer-events:auto }
+
+/* Keep hero centered while main stretches */
+.hero{ display:flex; flex-direction:column; align-items:center; text-align:center }
+
+/* === TOOLTIP STYLING === */
+.circle-button{ position:relative; }
+
+/* Floating tooltip for sidebar buttons */
+#sidebarTooltip{
+  position:fixed;
+  background:rgba(0,0,0,.85);
+  color:#fff;
+  font-size:.75rem; line-height:1;
+  padding:6px 8px; border-radius:6px; white-space:nowrap; pointer-events:none;
+  opacity:0; transform:translate(-50%, -8px);
+  transition:opacity .12s ease, transform .12s ease;
+  z-index:4000;
+}
+#sidebarTooltip.show{ opacity:1; transform:translate(-50%, -12px); }
+
+/* === FINAL: Tag text colors === */
+:root {
+  --tag-text: #000;         /* light mode default */
+  --tag-text-active: #000;  /* selected/active text */
+}
+html[data-theme="dark"] {
+  --tag-text: #fff;         /* dark mode default */
+  --tag-text-active: #000;  /* selected/active stays black for contrast */
+}
+
+/* Applies to: sidebar tag list, chips in cards, and filter bar chips */
+.tag-list li,
+.tag-chip,
+.tag-chip-btn,
+.tag-list .delete-tag {
+  color: var(--tag-text) !important;
+}
+
+/* Selected/active → black in all modes */
+.tag-chip.active,
+.tag-chip-btn.active,
+.tag-list li.active,
+.tag-list .delete-tag.active {
+  color: var(--tag-text-active) !important;
+}
+

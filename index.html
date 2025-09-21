@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Commonplace</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="container">
+            <img id="bookIcon" src="images/close-book-icon.jpg" alt="Book Icon" class="icon" />
+            <nav id="sidebar" class="sidebar">
+                <ul>
+                    <div class="sidebar-buttons">
+                        <button id="plusButton" class="circle-button black" data-tooltip="Add something to your space.">+</button>
+                        <button id="searchButton" class="circle-button black" data-tooltip="Search your space.">🔍</button>
+                        <button id="customizeButton" class="circle-button black" data-tooltip="Customize your space.">⚙️</button>
+                    </div>
+                    <div id="searchBox" class="search-box hidden">
+                        <input id="searchInput" type="text" placeholder="Search..." />
+                    </div>
+                    <div id="plusMenu" class="plus-menu hidden">
+                        <!-- Options view -->
+                         <div id="plusOptions">
+                            <div class="plus-option" data-type="quote">
+                                <button id="addQuoteButton">Quote</button>
+                                <span>Add a quote to your place.</span>
+                            </div>
+                            <div class="plus-option" data-type="write">
+                                <button id="addWriteButton">Write</button>
+                                <span>Add a piece of writing to your place.</span>
+                            </div>
+                            <div class="plus-option" data-type="visual">
+                                <button id="addVisualButton">Visual</button>
+                                <span>Add a visual element to your place.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div id="customizeMenu" class="customize-menu hidden">
+                            <h3>Customize</h3>
+
+                            <div class="setting-row">
+                                <label class="switch">
+                                    <input id="themeToggleInput" type="checkbox" />
+                                    <span class="slider"></span>
+                                </label>
+                                <div class="setting-text">
+                                    <strong>Dark mode</strong>
+                                    <div class="muted">Change up the vibe.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                
+                <form id="quoteForm" class="quote-form hidden">
+                        <textarea id="quoteText" placeholder="Enter quote..." required maxlength="150"></textarea>
+                        <input type="text" id="quoteAuthor" placeholder="Author" maxlength="50" />
+                            <input type="text" id="quoteBook" placeholder="Book" maxlength="100" />
+                            <div style="display:flex;justify-content:space-between;gap:0.5rem;">
+                                <button type="submit" id="submitQuote">Add Quote</button>
+                                <button type="button" id="cancelQuote">Cancel</button>
+                            </div>
+                        </form>
+
+                        <!-- Tag Manager -->
+                         <section id="tagManager" class="tag-manager">
+                            <h3>Tags</h3>
+                            <form id="tagCreateForm" class="tag-create">
+                                <input id="newTagName" type="text" maxlength="20" placeholder="New tag name…" />
+                                <button type="submit" id="addTagBtn">Add</button>
+                            </form>
+                            <p id="tagLimitMsg" class="tag-limit hidden">You can create up to 5 tags.</p>
+                            <ul id="tagList" class="tag-list"></ul>
+                        </section>
+
+                </ul>
+            </nav>
+            <main class="main">
+                <section class="hero">
+                <p class="subtitle">this is our</p>
+                <h1 class="title">commonplace</h1>
+                <img src="images/fairies.png" alt="Logo Image" class="logo-image" />
+                <p class="tagline">the words you love, in a place you love.</p>
+
+                <section class="scroll-prompt">
+                    <p>DIVE IN</p>
+                    <img src="images/scroll-arrow.png" alt="Scroll Arrow" class="scroll-arrow" />
+                </section>
+                </section>
+
+                <!-- Board Section -->
+                <section class="main-board">
+                    <div id="tagFilterBar" class="tag-filter-bar"></div>
+                    <p id="emptyBoardMessage" class="empty-board hidden">Huh, it's pretty empty here. Add something using the + menu.</p>
+                    <p id="noResultsMessage" class="no-results hidden">No cards match your search.</p>
+                    <div id="boardGrid" class="board-grid"></div>
+                </section>
+                
+                
+            </main>
+            <div id="writeModal" class="modal-overlay hidden">
+                    <div class="write-modal">
+                        <form id="writeForm" class="write-form">
+                            <textarea id="writeText" placeholder="Write here..." required maxlength="5000"></textarea>
+                            <div style="display:flex;justify-content:space-between;gap:0.5rem;">
+                                <button type="submit" id="submitWrite">Add Piece</button>
+                                <div style="display:flex;gap:0.5rem;">
+                                    <button type="button" id="copyWrite">Copy</button>
+                                    <button type="button" id="cancelWrite">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            
+            </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
